@@ -5,7 +5,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Categories extends Model
+class Payments extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -14,10 +14,5 @@ class Categories extends Model
      */
     protected $fillable = [ 
     ]; 
-
-    public function category()
-    {
-        return $this->belongTo('App\Prestataires','id','category_id');
-    }
  
 }

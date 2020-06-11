@@ -17,15 +17,19 @@ $router->get('/', function () use ($router) {
 
 
 
-$router->group(['prefix' => 'api'], function () use ($router) { 
-    $router->get('me', ['uses' =>'AuthController@me', 'as' => 'profile']); 
-    $router->get('users', ['uses' => 'UsersController@index', 'as' => 'all_users']);
-	$router->get('user/{id}', ['uses' => 'UsersController@getUser', 'as' => 'userDeatils']);
+$router->group(['prefix' => 'api'], function () use ($router) {
 
+    $router->get('me', ['uses' =>'AuthController@me', 'as' => 'profile']); 
+    $router->get('refreshtoken', ['uses' =>'AuthController@refresh', 'as' => 'refresh']);  
+	$router->get('user/{id}', ['uses' => 'UsersController@getUser', 'as' => 'userDeatils']);
+	$router->get('prestataires', ['uses' => 'UsersController@prestataires', 'as' => 'prestataires']); 
+	
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']); 
 	$router->get('categories', ['uses' => 'CategoriesController@index', 'as' => 'categories']);
 
+	$router->post('make_payment',  ['uses' =>'PaymentsController@store', 'as' => 'makePayment']); 
+	$router->get('manage-reservation/{id}/{action}',  ['uses' =>'ReservationsController@manageReservation', 'as' => 'manageReservations']); 
 });
 
 

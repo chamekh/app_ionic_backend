@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request; 
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Http\Request;  
 use App\Users;
 use App\Adresses;
 use App\Prestataires; 
- use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;  
      
 class UsersController extends Controller
 { 
@@ -26,8 +25,23 @@ class UsersController extends Controller
         }
         return response()->json(['success'=>true,'data'=>$users]) ;
     }
+    public function prestataires () {
+         
+
+        $users = Users::where('user_type','>',0)
+                        ->with('adresse','prestataire','prestataire.category')
+                        ->get(); 
+
+        if (!$users) {
+              return response()->json([
+                  'success' => false,
+                  'message' => 'Sorry, user cannot be found.'
+              ], 400);
+        }
+        return response()->json(['success'=>true,'data'=>$users]) ;
+    }
     public function getUser ($id) { 
-        $user = Users::where('id',$id)->with('adresse','prestataire','category')->get();
+        $user = Users::where('id',$id)->with('adresse','reservations','prestataire','prestataire.category','prestataire.payments')->get();
         if (!$user) {
               return response()->json([
                   'success' => false,

@@ -78,8 +78,7 @@ class AuthController extends Controller
                 $user->avatar       = $request->avatar;
                 $user->tel          = $request->tel;
                 $user->fb           = $request->fb;
-                $user->insta        = $request->insta;
-                $user->user_type    = $request->user_type;
+                $user->insta        = $request->insta; 
                 $user->adresse_id   = $adresse->id; 
                 $user->save();
 
@@ -93,11 +92,15 @@ class AuthController extends Controller
                     $user->save();
                 }  
             }
+            $credentials = ['email'=>$request->email, 'password'=>$request->password] ; 
+            $token = Auth::attempt($credentials);
 
             return response()->json([
                   'success' => true,
-                  'data' => $user->id
+                  'data' => $user,
+                  'token' => $token
               ], 200);
+
         } catch (\Exception $e) {
             //return error message
             return response()->json(['success' =>false, 'message' => $e ], 409);

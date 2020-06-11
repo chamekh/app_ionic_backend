@@ -5,7 +5,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Categories extends Model
+class Reservations extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -15,9 +15,13 @@ class Categories extends Model
     protected $fillable = [ 
     ]; 
 
-    public function category()
+    protected $hidden = [
+        'user_id',
+        'prestataire_id',
+    ];
+
+    public function reservations()
     {
-        return $this->belongTo('App\Prestataires','id','category_id');
+        return $this->belongTo('App\Users','id','user_id');
     }
- 
 }

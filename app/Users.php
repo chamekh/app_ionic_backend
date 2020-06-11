@@ -53,13 +53,7 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
     public function prestataire () { 
         return $this->hasOne('App\Prestataires','id','user_type'); 
     }
-    public function category () {
-        return $this->hasOneThrough(
-            'App\Categories',
-            'App\Prestataires',
-            'category_id',   
-            'id', 
-            'id'
-        ); 
+    public function reservations () { 
+        return $this->hasMany('App\Reservations','user_id','id'); 
     } 
 }
