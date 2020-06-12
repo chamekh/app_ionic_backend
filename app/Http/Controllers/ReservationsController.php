@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Reservations;
 Use \Carbon\Carbon;
-
+ 
 
 class ReservationsController extends Controller
 {

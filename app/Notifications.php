@@ -5,7 +5,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Payments extends Model
+class Notifications extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -14,8 +14,5 @@ class Payments extends Model
      */
     protected $fillable = [ 
     ]; 
-    protected $hidden = [
-    	'prestataire_id',
-    ];
  
 }

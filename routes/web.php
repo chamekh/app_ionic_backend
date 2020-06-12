@@ -23,6 +23,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->get('refreshtoken', ['uses' =>'AuthController@refresh', 'as' => 'refresh']);  
 	$router->get('user/{id}', ['uses' => 'UsersController@getUser', 'as' => 'userDeatils']);
 	$router->get('prestataires', ['uses' => 'UsersController@prestataires', 'as' => 'prestataires']); 
+	$router->get('prestataires-category/{id}', ['uses' => 'UsersController@showPrestataireByCategoryId', 'as' => 'prestataires-category']); 
 	
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']); 
@@ -30,6 +31,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 	$router->post('make_payment',  ['uses' =>'PaymentsController@store', 'as' => 'makePayment']); 
 	$router->get('manage-reservation/{id}/{action}',  ['uses' =>'ReservationsController@manageReservation', 'as' => 'manageReservations']); 
+
+	$router->get('notifications',  ['uses' =>'NotificationsController@index', 'as' => 'myNotifications']);  
+	$router->get('notification/{id}',  ['uses' =>'NotificationsController@setNotficationsVue', 'as' => 'makeVueNotifications']); 
+
 });
 
 

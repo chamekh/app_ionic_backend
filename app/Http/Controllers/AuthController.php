@@ -25,8 +25,24 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
     public function me()
-    {
-        return response()->json(Auth::user());
+    {   
+
+        try { 
+
+            $user = Users::where('id',Auth::user()->id)
+            ->with(
+                'adresse',
+                'adresse.country',
+                'adresse.state',
+                'reservations', 
+                'prestataire.category',
+                'prestataire.payments'
+            )
+            ->get(); 
+            return response()->json(['success'=>true,'data'=>$user]) ;  
+        }catch (\Exception $e) {
+            return response()->json(['success' =>false, 'message' => $e ], 404);
+        }
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Payments extends Model
+class States extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -14,8 +14,13 @@ class Payments extends Model
      */
     protected $fillable = [ 
     ]; 
-    protected $hidden = [
-    	'prestataire_id',
+
+    protected $hidden = [ 
+        'country_id'
     ];
- 
+    
+    public function states()
+    {
+        return $this->belongTo('App\Adresses','id','state_id');
+    } 
 }

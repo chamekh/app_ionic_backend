@@ -15,9 +15,18 @@ class Categories extends Model
     protected $fillable = [ 
     ]; 
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'category_id'
+    ];
+    
     public function category()
     {
         return $this->belongTo('App\Prestataires','id','category_id');
+    } 
+    public function prestataires() { 
+        return $this->hasMany('App\Prestataires','category_id' ); 
     }
  
 }

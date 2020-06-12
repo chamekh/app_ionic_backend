@@ -28,6 +28,7 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
      */
     protected $hidden = [
         'password',
+        'user_type',
         'adresse_id',
     ];
 
