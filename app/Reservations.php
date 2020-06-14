@@ -24,4 +24,8 @@ class Reservations extends Model
     {
         return $this->belongTo('App\Users','id','user_id');
     }
+    public function prestataire()
+    {
+        return $this->hasOne('App\Users','id','prestataire_id');
+    }
 }

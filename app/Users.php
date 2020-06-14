@@ -27,9 +27,11 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password', 
+        'category_id',
         'user_type',
-        'adresse_id',
+        'deleted_at',
+        'updated_at'
     ];
 
      public function getJWTIdentifier()
@@ -45,16 +47,15 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
     public function getJWTCustomClaims()
     {
         return [];
-    }
-
-    public function adresse()
-    {
-        return $this->hasOne('App\Adresses','id','adresse_id');
-    }
-    public function prestataire () { 
-        return $this->hasOne('App\Prestataires','id','user_type'); 
-    }
+    } 
     public function reservations () { 
         return $this->hasMany('App\Reservations','user_id','id'); 
+    }
+    public function category () { 
+        return $this->hasOne('App\Categories','id','category_id'); 
+    }
+    public function payments() 
+    {
+        return $this->hasMany('App\Payments','user_id','id');
     } 
 }

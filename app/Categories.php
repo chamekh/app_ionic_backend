@@ -17,16 +17,15 @@ class Categories extends Model
 
     protected $hidden = [
         'created_at',
-        'updated_at',
-        'category_id'
+        'updated_at', 
     ];
     
     public function category()
     {
-        return $this->belongTo('App\Prestataires','id','category_id');
+        return $this->belongTo('App\Users','id','category_id');
     } 
-    public function prestataires() { 
-        return $this->hasMany('App\Prestataires','category_id' ); 
-    }
- 
+
+    public function users() { 
+        return $this->hasMany('App\Users','category_id' ); 
+    } 
 }

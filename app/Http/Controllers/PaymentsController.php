@@ -24,12 +24,11 @@ class PaymentsController extends Controller
     public function store (Request $request) {  
         try {
             $payment = new Payments() ;
-            $payment->prestataire_id = $request->prestataire_id ; 
+            $payment->user_id        = $request->user_id ; 
             $payment->amount         = $request->amount ; 
-            $payment->method         = $request->method ; 
-            $payment->payed_at       = Carbon::now()->toDateTimeString();  
+            $payment->method         = $request->method ;  
             $payment->end_at         = Carbon::now()->add(1, 'month')->toDateTimeString();  
-            $payment->save() ; 
+            $payment->save() ;  
 
             return response()->json(['success' =>true, 'data' =>$payment  ], 200);
 
@@ -37,5 +36,5 @@ class PaymentsController extends Controller
             //return error message
             return response()->json(['success' =>false, 'message' => $e ], 409);
         }
-    }
+    } 
 }

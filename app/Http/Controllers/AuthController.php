@@ -3,9 +3,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;   
  use Illuminate\Support\Facades\Auth;  
-use App\Users;
-use App\Adresses;
-use App\Prestataires; 
+use App\Users; 
      
 class AuthController extends Controller
 { 
@@ -14,29 +12,26 @@ class AuthController extends Controller
     {
         $this->middleware('auth:api', ['except' => ['login','register']]);
     }
+
     public function login(Request $request)
     {
         $credentials = $request->only(['email', 'password']);
 
         if (! $token = Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Login or password incorect ! '], 403);
         }
 
         return $this->respondWithToken($token);
     }
     public function me()
-    {   
-
-        try { 
-
+    {    
+        try {  
             $user = Users::where('id',Auth::user()->id)
-            ->with(
-                'adresse',
-                'adresse.country',
-                'adresse.state',
+            ->with( 
+                'category',
+                'payments',
                 'reservations', 
-                'prestataire.category',
-                'prestataire.payments'
+                'reservations.prestataire'
             )
             ->get(); 
             return response()->json(['success'=>true,'data'=>$user]) ;  
@@ -54,7 +49,7 @@ class AuthController extends Controller
     {
         Auth::logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['success'=>true, 'message' => 'Successfully logged out']);
     }
 
     /**
@@ -75,39 +70,29 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        try {  
-            $adresse = new Adresses();
-            $adresse->country_id  =  $request->country_id ;
-            $adresse->state_id    =  $request->state_id ;
-            $adresse->adresse     =  $request->adresse ;
-            $adresse->zip_code    =  $request->zip_code ;
-            $adresse->latitude    =  $request->latitude ;
-            $adresse->longitude   =  $request->longitude ; 
-
-            if ($adresse->save()) {
-
-                $user = new Users();
-                $user->last_name    = $request->last_name;
-                $user->first_name   = $request->first_name;
-                $user->email        = $request->email;
-                $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
-                $user->avatar       = $request->avatar;
-                $user->tel          = $request->tel;
-                $user->fb           = $request->fb;
-                $user->insta        = $request->insta; 
-                $user->adresse_id   = $adresse->id; 
-                $user->save();
-
-                if ($request->user_type ==1) { 
-                    $prestataires = new Prestataires() ;
-                    $prestataires->category_id = $request->category_id;
-                    $prestataires->user_id     = $user->id; 
-                    $prestataires->save(); 
-
-                    $user->user_type    = $request->user_type;
-                    $user->save();
-                }  
-            }
+        try {   
+           
+            $user = new Users();
+            $user->last_name    = $request->last_name;
+            $user->first_name   = $request->first_name;
+            $user->email        = $request->email;
+            $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
+            $user->avatar       = $request->avatar;
+            $user->tel          = $request->tel;
+            $user->fb           = $request->fb;
+            $user->insta        = $request->insta;
+            $user->country     =  $request->country ;
+            $user->state       =  $request->state ;
+            $user->adresse     =  $request->adresse ;
+            $user->zip_code    =  $request->zip_code ;
+            $user->latitude    =  $request->latitude ;
+            $user->longitude   =  $request->longitude ;  
+            if ($request->user_type == 1) { 
+                $user->user_type    = $request->user_type; 
+                $user->category_id  = $request->category_id;
+            }  
+            $user->save();
+            
             $credentials = ['email'=>$request->email, 'password'=>$request->password] ; 
             $token = Auth::attempt($credentials);
 

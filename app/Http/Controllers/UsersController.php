@@ -15,24 +15,13 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-    } 
-    public function index () {
-        $users = Users::with('adresse')->get(); 
-        if (!$users) {
-              return response()->json([
-                  'success' => false,
-                  'message' => 'Sorry, user cannot be found.'
-              ], 400);
-        }
-        return response()->json(['success'=>true,'data'=>$users]) ;
     }
+
     public function prestataires () { 
         $users = Users::where('user_type','>',0)
-                        ->with(
-                            'adresse',
-                            'adresse.country',
-                            'adresse.state', 
-                            'prestataire.category' 
+                        ->with( 
+                            'category',
+                            'payments'
                         ) 
                         ->get(); 
 
@@ -42,22 +31,31 @@ class UsersController extends Controller
                   'message' => 'Sorry, user cannot be found.'
               ], 400);
         }
-        return response()->json(['success'=>true,'data'=>$users]) ;
-    }
-    public function showPrestataireByCategoryId ($id) {
-        $users = Categories::where('id',$id) 
+        return response()->json(['success'=>true,'data'=>$this->orberByDistance($users)]) ;
+    } 
+
+    public function showPrestataireByCategoryId ($id) {   
+        $users = Users::where('category_id',$id) 
                 ->with(
-                    /*'adresse',
-                    'adresse.country',
-                    'adresse.state', */ 
-                    'prestataires.user' ,
-                    'prestataires.user.adresse' ,
-                    'prestataires.user.adresse.country' ,
-                    'prestataires.user.adresse.state' ,
+                    'category',
+                    'payments'
                 )
-                ->get();  
-        return response()->json(['success'=>true,'data'=>$users]) ;
+                ->get(); 
+        return response()->json(['success'=>true,'data'=>$this->orberByDistance($users)]) ;
+    } 
+
+    private function orberByDistance ($array) {
+        $n_array = array() ;    
+        foreach ($array as $user) {
+            $user->distance =   (($user ->latitude  - Auth::user()->latitude)**2)  +((($user->longitude - Auth::user()->longitude)/cos($user->latitude/57.295)) **2) **.5 / .009;
+            $n_array[] = $user ; 
+        }
+        usort($n_array, function($a, $b) {
+            return $a['distance'] - $b['distance'];
+        }); 
+        return $n_array ; 
     }
+    
     public function getUser ($id) { 
         $user = Users::where('id',$id)
         ->with(

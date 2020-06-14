@@ -15,7 +15,7 @@ class Payments extends Model
     protected $fillable = [ 
     ]; 
     protected $hidden = [
-    	'prestataire_id',
+    	'user_id',
     ];
  
 }
