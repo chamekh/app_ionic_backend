@@ -27,13 +27,13 @@ class AuthController extends Controller
     {    
         try {  
             $user = Users::where('id',Auth::user()->id)
-            ->with( 
+            /*->with( 
                 'category',
                 'payments',
                 'reservations', 
                 'reservations.prestataire'
-            )
-            ->get(); 
+            )*/
+            ->first(); 
             return response()->json(['success'=>true,'data'=>$user]) ;  
         }catch (\Exception $e) {
             return response()->json(['success' =>false, 'message' => $e ], 404);

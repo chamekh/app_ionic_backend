@@ -8,13 +8,16 @@ use App\Users;
 use App\Adresses;
 use App\Prestataires; 
 use App\Categories; 
+use Illuminate\Support\Facades\Storage; 
      
 class UsersController extends Controller
 { 
 
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth',['except' => [
+            'prestatairesImages',
+        ]]);
     }
 
     public function prestataires () { 
@@ -48,6 +51,7 @@ class UsersController extends Controller
         $n_array = array() ;    
         foreach ($array as $user) {
             $user->distance =   (($user ->latitude  - Auth::user()->latitude)**2)  +((($user->longitude - Auth::user()->longitude)/cos($user->latitude/57.295)) **2) **.5 / .009;
+            $user->distance =   number_format((float)$user->distance, 2, '.', '');
             $n_array[] = $user ; 
         }
         usort($n_array, function($a, $b) {
@@ -76,5 +80,11 @@ class UsersController extends Controller
         return response()->json(['success'=>true,'data'=>$user]) ;  
     }
 
+    public function prestatairesImages($id) {
+        $prestataire = Users::find($id) ;  
+        $path = storage_path('app/images/users/'.$prestataire->avatar) ;   
+        header("Content-type: image/jpeg"); 
+        echo Storage::get('images/users/'.$prestataire->avatar); 
+    }
     
 }

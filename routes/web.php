@@ -28,6 +28,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']); 
 	$router->get('categories', ['uses' => 'CategoriesController@index', 'as' => 'categories']);
+	$router->get('prestataires/avatar/{id}', ['uses' => 'UsersController@prestatairesImages', 'as' => 'prestataires_image']);
 
 	$router->post('make_payment',  ['uses' =>'PaymentsController@store', 'as' => 'makePayment']); 
 	$router->get('manage-reservation/{id}/{action}',  ['uses' =>'ReservationsController@manageReservation', 'as' => 'manageReservations']); 
@@ -37,6 +38,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 });
 
+
+ 
 
 
 
