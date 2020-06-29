@@ -32,13 +32,15 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 	$router->post('make_payment',  ['uses' =>'PaymentsController@store', 'as' => 'makePayment']); 
 	$router->get('manage-reservation/{id}/{action}',  ['uses' =>'ReservationsController@manageReservation', 'as' => 'manageReservations']); 
+	$router->post('reservation', ['uses' => 'ReservationsController@store', 'as' => 'makeReservation']); 
+	$router->get('reservation', ['uses' => 'ReservationsController@showReservations', 'as' => 'getReservation']); 
 
 	//$router->get('notifications',  ['uses' =>'NotificationsController@index', 'as' => 'myNotifications']);  
 	//$router->get('notification/{id}',  ['uses' =>'NotificationsController@setNotficationsVue', 'as' => 'makeVueNotifications']); 
 
 });
 
-
+ 
  
 
 

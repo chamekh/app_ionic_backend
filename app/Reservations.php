@@ -28,4 +28,8 @@ class Reservations extends Model
     {
         return $this->hasOne('App\Users','id','prestataire_id');
     }
+    public function user()
+    {
+        return $this->hasOne('App\Users','id','user_id');
+    }
 }
