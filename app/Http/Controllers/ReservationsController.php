@@ -40,15 +40,19 @@ class ReservationsController extends Controller
             return response()->json(['success' =>false, 'message' => $e ], 409);
         }
     }
-    public function manageReservation ($id,$action = 0) {
-        $user = Auth::user() ;
+    public function manageReservation ($id,$action = 1) {
+        $user = Auth::user() ; 
 
-        $reservation = Reservations::find($id) ; 
+        if ($user->user_type == 0) {
+            $reservation = Reservations::where('id',$id)->with('prestataire')->first() ;  
+        }else if ($user->user_type == 1) {
+            $reservation = Reservations::where('id',$id)->with('user')->first() ;  
+        }
 
         if ($reservation && $reservation->prestataire_id == $user->id) { 
             $reservation->status =  $action ; 
             $reservation->updated_at = Carbon::now()->toDateTimeString(); 
-            if ((int) $action === 0) { 
+            if ((int) $action === 2) { 
                 $reservation->deleted_at = Carbon::now()->toDateTimeString(); 
             }
             $reservation->save() ; 
