@@ -21,7 +21,7 @@ class CategoriesController extends Controller
     public function index () {
 
         try {
-            $Categories = Categories::all(); 
+            $Categories = Categories::withCount('users')->get(); 
             return response()->json(['success' =>true, 'data' => $Categories ], 200);
         }catch (\Exception $e) {
             return response()->json(['success' =>false, 'message' => $e ], 409);
