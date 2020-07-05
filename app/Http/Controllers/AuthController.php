@@ -77,7 +77,7 @@ class AuthController extends Controller
             $user->first_name   = $request->first_name;
             $user->email        = $request->email;
             $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
-            $user->avatar       = $request->avatar;
+            $user->avatar       = ($request->avatar) ? $request->avatar : 'avatar.png';
             $user->tel          = $request->tel;
             $user->fb           = $request->fb;
             $user->insta        = $request->insta;
@@ -90,6 +90,7 @@ class AuthController extends Controller
             if ($request->user_type == 1) { 
                 $user->user_type    = $request->user_type; 
                 $user->category_id  = $request->category_id;
+                $user->bio          = $request->bio;
             }  
             $user->save();
             

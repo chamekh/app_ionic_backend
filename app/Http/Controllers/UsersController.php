@@ -62,15 +62,11 @@ class UsersController extends Controller
     
     public function getUser ($id) { 
         $user = Users::where('id',$id)
-        ->with(
-                'adresse',
-                'adresse.country',
-                'adresse.state',
-                'reservations', 
-                'prestataire.category',
-                'prestataire.payments'
+        ->with(  
+                'category',
+                'payments'
             )
-        ->get();
+        ->first();
         if (!$user) {
               return response()->json([
                   'success' => false,
@@ -85,6 +81,10 @@ class UsersController extends Controller
         $path = storage_path('app/images/users/'.$prestataire->avatar) ;   
         header("Content-type: image/jpeg"); 
         echo Storage::get('images/users/'.$prestataire->avatar); 
+    }
+    public function updateUser (Request $request, $id) {
+        $user =   Users::where('id',$id)->update($request->all()); 
+        return response()->json(['success'=>true,'data'=>$user]) ; 
     }
     
 }
