@@ -83,7 +83,28 @@ class UsersController extends Controller
         echo Storage::get('images/users/'.$prestataire->avatar); 
     }
     public function updateUser (Request $request, $id) {
-        $user =   Users::where('id',$id)->update($request->all()); 
+
+        $user =   Users::find($id); 
+
+        $user->last_name    = $request->last_name;
+        $user->first_name   = $request->first_name;
+        $user->email        = $request->email; 
+        $user->avatar       = $request->avatar;
+        $user->tel          = $request->tel;
+        $user->fb           = $request->fb;
+        $user->insta        = $request->insta;
+        $user->country      = $request->country ;
+        $user->state        = $request->state ;
+        $user->adresse      = $request->adresse ;
+        $user->zip_code     = $request->zip_code ;   
+        $user->bio          = $request->bio; 
+
+        if ($request->password) { 
+            $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
+        }
+
+        $user->save();
+
         return response()->json(['success'=>true,'data'=>$user]) ; 
     }
     

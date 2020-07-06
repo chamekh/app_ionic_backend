@@ -77,7 +77,7 @@ class AuthController extends Controller
             $user->first_name   = $request->first_name;
             $user->email        = $request->email;
             $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
-            $user->avatar       = ($request->avatar) ? $request->avatar : 'avatar.png';
+            $user->avatar       = $request->avatar;
             $user->tel          = $request->tel;
             $user->fb           = $request->fb;
             $user->insta        = $request->insta;
