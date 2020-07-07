@@ -26,13 +26,7 @@ class AuthController extends Controller
     public function me()
     {    
         try {  
-            $user = Users::where('id',Auth::user()->id)
-            /*->with( 
-                'category',
-                'payments',
-                'reservations', 
-                'reservations.prestataire'
-            )*/
+            $user = Users::where('id',Auth::user()->id) 
             ->first(); 
             return response()->json(['success'=>true,'data'=>$user]) ;  
         }catch (\Exception $e) {
