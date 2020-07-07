@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Support\Str;
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -12,7 +12,7 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return Str::random(6); //$router->app->version();
 });
 
 
@@ -23,6 +23,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']);
+	$router->post('forgot',  ['uses' =>'AuthController@forgot', 'as' => 'forgot']); 
+	$router->post('reset-password-code',  ['uses' =>'AuthController@checkCodeToken', 'as' => 'checkCodeToken']); 
+	$router->post('reset-password',  ['uses' =>'AuthController@resetPassword', 'as' => 'resetPassword']); 
 
     $router->get('me', ['uses' =>'AuthController@me', 'as' => 'profile']); 
     $router->get('refreshtoken', ['uses' =>'AuthController@refresh', 'as' => 'refresh']);  

@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;   
  use Illuminate\Support\Facades\Auth;  
 use App\Users; 
+use Illuminate\Support\Str;
      
 class AuthController extends Controller
-{ 
-
+{  
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:api', ['except' => ['login','register','forgot','resetPassword','checkCodeToken']]);
     }
 
     public function login(Request $request)
@@ -100,6 +100,36 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             //return error message
             return response()->json(['success' =>false, 'message' => $e ], 409);
+        }
+    }
+
+    public function forgot (Request $request) {
+
+        $email = $request->only('email');
+        $user  = Users::where('email',$email)->first();  
+        $token = Str::random(6); 
+
+        /// here send the token to email ; 
+
+        $update_user = Users::where('id',$user->id)->update(['token_reset' => $token]) ; 
+        return response()->json(['success'=>true,'data'=>$update_user],200) ;   
+    }
+    public function checkCodeToken (Request $request) {
+        $token = $request->code ; 
+        $isExist = Users::where('token_reset',$token)->first(); 
+        if ($isExist) {
+            return response()->json(['success'=>true,'data'=>true],200) ;
+        }else{
+            return response()->json(['success'=>false,'data'=>false],200) ;
+        }
+    }
+    public function resetPassword (Request $request) { 
+        try {
+            $isUpdated = Users::where('token_reset',$request->code)->update(['password' => app('hash')->make($request->password, ['rounds' => 12]) , 'token_reset'=> '' ]); 
+            return response()->json(['success'=>true,'data'=>$isUpdated],200) ; 
+        } catch (\Exception $e) {
+            //return error message
+            return response()->json(['success' =>false, 'message' => $e ], 404);
         }
     }
 }
