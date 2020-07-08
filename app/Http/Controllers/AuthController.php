@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;   
  use Illuminate\Support\Facades\Auth;  
 use App\Users; 
-use Illuminate\Support\Str;
+use Illuminate\Support\Str; 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
      
 class AuthController extends Controller
 {  
@@ -107,10 +110,8 @@ class AuthController extends Controller
 
         $email = $request->only('email');
         $user  = Users::where('email',$email)->first();  
-        $token = Str::random(6); 
-
-        /// here send the token to email ; 
-
+        $token = Str::random(6);   
+        $mail_sent = $this->send_mail($token,$user->email) ; 
         $update_user = Users::where('id',$user->id)->update(['token_reset' => $token]) ; 
         return response()->json(['success'=>true,'data'=>$update_user],200) ;   
     }
@@ -130,6 +131,35 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             //return error message
             return response()->json(['success' =>false, 'message' => $e ], 404);
+        }
+    }
+
+    public function send_mail ($code,$email) {
+        $mail = new PHPMailer(true);
+        try {
+            //Server settings
+            $mail->SMTPDebug = 0;                                 // Enable verbose debug output
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->Host = 'smtp.gmail.com';                       // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                               // Enable SMTP authentication
+            $mail->Username = 'chamekhala@gmail.com';             // SMTP username
+            $mail->Password = 'misterdark';                       // SMTP password
+            $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = 587;                                    // TCP port to connect to
+
+            //Recipients 
+            $mail->setFrom('chamekhala@gmail.com', 'Mailer');
+            $mail->addAddress($email);     // Add a recipient   
+             
+            //Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = 'Réinitialisation du mot de passe';
+            $mail->Body    = 'Code : '.$code ; 
+
+            $mail->send();
+            return true ; 
+        } catch (Exception $e) {
+            return false ; 
         }
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Users;
 use App\Payments;
 Use \Carbon\Carbon;
+use Stripe;
 
 class PaymentsController extends Controller
 {
@@ -22,12 +23,23 @@ class PaymentsController extends Controller
     } 
 
     public function store (Request $request) {  
-        $user = Auth::user() ;
+
+
+        $user = Auth::user() ; 
+
+        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe\Charge::create ([
+            "amount" => 9 * 100,
+            "currency" => "usd",
+            "source" => $request->stripeToken,
+            "description" => "Test payment from itsolutionstuff.com." 
+        ]);
+
         try {
             $payment = new Payments() ;
             $payment->user_id        = $user->id ; 
             $payment->amount         = 9 ; 
-            $payment->method         = $request->method ;  
+            $payment->method         = 'STRIPE' ;  
             $payment->end_at         = Carbon::now()->add(1, 'month')->toDateTimeString();  
             $payment->save() ;  
 
