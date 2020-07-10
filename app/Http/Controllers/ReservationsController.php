@@ -64,9 +64,10 @@ class ReservationsController extends Controller
     }
     public function showReservations () {
         $user = Auth::user() ; 
+        $reservation = array() ; 
         if ($user->user_type == 0) {
             $reservation = Reservations::where('user_id',$user->id)->with('prestataire')->get() ;  
-        }else if ($user->user_type == 1) {
+        }else if ($user->user_type == 1 && $user->status == 1) {
             $reservation = Reservations::where('prestataire_id',$user->id)->with('user')->get() ;  
         }
         return response()->json(['success' =>true, 'data' =>$reservation  ], 200); 

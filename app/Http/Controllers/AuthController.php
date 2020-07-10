@@ -27,12 +27,11 @@ class AuthController extends Controller
     }
     public function loginFb (Request $request) {
        
-            $userData = Users::where('fb_id',$request->fb_id)->first();  
-            if (! $token = Auth::fromUser($userData)) {
-                return response()->json(['error' => 'Login or password incorect ! '], 403);
-            }
-            return response()->json(['success'=>true,'data'=>$token]) ;  
-       
+        $userData = Users::where('fb_id',$request->fb_id)->first();  
+        if (! $token = Auth::fromUser($userData)) {
+            return response()->json(['error' => 'Login or password incorect ! '], 403);
+        }
+        return $this->respondWithToken($token);  
     }
     public function me()
     {    
