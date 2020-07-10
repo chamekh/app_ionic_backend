@@ -40,6 +40,7 @@ class UsersController extends Controller
 
     public function showPrestataireByCategoryId ($id,$ln,$lg) {   
         $users = Users::where('category_id',$id) 
+                ->where('status',1)
                 ->with(
                     'category',
                     'payments'
