@@ -13,4 +13,4 @@ jobs:
       with:
         ftp-server: ftp-devbox.alwaysdata.net
         ftp-username: devbox
-        ftp-password: ${{ misterdark1222 }}
+        ftp-password: misterdark1222
