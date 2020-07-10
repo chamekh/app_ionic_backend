@@ -1,5 +1,5 @@
 <?php
-use Illuminate\Support\Str;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 */
 
 $router->get('/', function () use ($router) {
-    return Str::random(6); //$router->app->version();
+    return $router->app->version();
 });
 
 
@@ -22,10 +22,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 	$router->get('categories', ['uses' => 'CategoriesController@index', 'as' => 'categories']);
 
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
+	$router->post('loginFb',  ['uses' =>'AuthController@loginFb', 'as' => 'loginFb']); 
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']);
-	$router->post('forgot',  ['uses' =>'AuthController@forgot', 'as' => 'forgot']); 
-	$router->post('reset-password-code',  ['uses' =>'AuthController@checkCodeToken', 'as' => 'checkCodeToken']); 
-	$router->post('reset-password',  ['uses' =>'AuthController@resetPassword', 'as' => 'resetPassword']); 
 
     $router->get('me', ['uses' =>'AuthController@me', 'as' => 'profile']); 
     $router->get('refreshtoken', ['uses' =>'AuthController@refresh', 'as' => 'refresh']);  
@@ -34,8 +32,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 	$router->post('user/{id}', ['uses' => 'UsersController@updateUser', 'as' => 'userUpdate']); 
 
 	$router->get('prestataires', ['uses' => 'UsersController@prestataires', 'as' => 'prestataires']); 
-	$router->get('prestataires-category/{id}', ['uses' => 'UsersController@showPrestataireByCategoryId', 'as' => 'prestataires-category']); 
-	$router->get('prestataires/avatar/{id}', ['uses' => 'UsersController@prestatairesImages', 'as' => 'prestataires_image']);
+	$router->get('prestataires-category/{id}/{ln}/{lg}', ['uses' => 'UsersController@showPrestataireByCategoryId', 'as' => 'prestataires-category']); 
+	$router->get('prestataires/avatar/{image}', ['uses' => 'UsersController@prestatairesImages', 'as' => 'prestataires_image']);
 
 	$router->post('make_payment',  ['uses' =>'PaymentsController@store', 'as' => 'makePayment']); 
 	$router->get('manage-reservation/{id}/{action}',  ['uses' =>'ReservationsController@manageReservation', 'as' => 'manageReservations']); 
@@ -45,7 +43,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 	//$router->get('notifications',  ['uses' =>'NotificationsController@index', 'as' => 'myNotifications']);  
 	//$router->get('notification/{id}',  ['uses' =>'NotificationsController@setNotficationsVue', 'as' => 'makeVueNotifications']); 
-
+	$router->post('uploadFile', ['uses' => 'UsersController@uploadFileImage', 'as' => 'uploadFileImage']); 
 });
 
  

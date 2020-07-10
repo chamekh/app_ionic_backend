@@ -17,6 +17,7 @@ class UsersController extends Controller
     {
         $this->middleware('auth',['except' => [
             'prestatairesImages',
+            'uploadFileImage',
         ]]);
     }
 
@@ -37,20 +38,20 @@ class UsersController extends Controller
         return response()->json(['success'=>true,'data'=>$this->orberByDistance($users)]) ;
     } 
 
-    public function showPrestataireByCategoryId ($id) {   
+    public function showPrestataireByCategoryId ($id,$ln,$lg) {   
         $users = Users::where('category_id',$id) 
                 ->with(
                     'category',
                     'payments'
                 )
                 ->get(); 
-        return response()->json(['success'=>true,'data'=>$this->orberByDistance($users)]) ;
+        return response()->json(['success'=>true,'data'=>$this->orberByDistance($users,$ln,$lg)]) ;
     } 
 
-    private function orberByDistance ($array) {
+    private function orberByDistance ($array,$ln,$lg) {
         $n_array = array() ;    
         foreach ($array as $user) {
-            $user->distance =   (($user ->latitude  - Auth::user()->latitude)**2)  +((($user->longitude - Auth::user()->longitude)/cos($user->latitude/57.295)) **2) **.5 / .009;
+            $user->distance =   (($user ->latitude  - $ln)**2)  +((($user->longitude - $lg)/cos($user->latitude/57.295)) **2) **.5 / .009;
             $user->distance =   number_format((float)$user->distance, 2, '.', '');
             $n_array[] = $user ; 
         }
@@ -76,11 +77,9 @@ class UsersController extends Controller
         return response()->json(['success'=>true,'data'=>$user]) ;  
     }
 
-    public function prestatairesImages($id) {
-        $prestataire = Users::find($id) ;  
-        $path = storage_path('app/images/users/'.$prestataire->avatar) ;   
-        header("Content-type: image/jpeg"); 
-        echo Storage::get('images/users/'.$prestataire->avatar); 
+    public function prestatairesImages($image) {  
+        $path = storage_path('app/images/users/'.$image) ; 
+        return response(Storage::get('images/users/'.$image), 200, ['Content-Type' => 'image/jpeg']);
     }
     public function updateUser (Request $request, $id) {
 
@@ -106,6 +105,22 @@ class UsersController extends Controller
         $user->save();
 
         return response()->json(['success'=>true,'data'=>$user]) ; 
+    }
+    public function uploadFileImage (Request $request) {  
+
+        if ($request->hasFile('image')) {
+            $original_filename = $request->file('image')->getClientOriginalName();
+            $original_filename_arr = explode('.', $original_filename);
+            $file_ext = end($original_filename_arr);
+            $destination_path = storage_path().'/app/images/users/';
+            $image = 'U-' . time() . '.' . $file_ext;
+
+            if ($request->file('image')->move($destination_path, $image)) {  
+               return response($image)  ; 
+            } else {
+                return response('https://www.kasterencultuur.nl/editor/placeholder.jpg'); 
+            }
+        }    
     }
     
 }

@@ -2,7 +2,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;   
- use Illuminate\Support\Facades\Auth;  
+use Illuminate\Support\Facades\Auth;  
 use App\Users; 
 use Illuminate\Support\Str; 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -13,7 +13,7 @@ class AuthController extends Controller
 {  
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register','forgot','resetPassword','checkCodeToken']]);
+        $this->middleware('auth:api', ['except' => ['login','loginFb','register','forgot','resetPassword','checkCodeToken']]);
     }
 
     public function login(Request $request)
@@ -22,9 +22,17 @@ class AuthController extends Controller
 
         if (! $token = Auth::attempt($credentials)) {
             return response()->json(['error' => 'Login or password incorect ! '], 403);
-        }
-
+        } 
         return $this->respondWithToken($token);
+    }
+    public function loginFb (Request $request) {
+       
+            $userData = Users::where('fb_id',$request->fb_id)->first();  
+            /*if (! $token = Auth::fromUser($userData)) {
+                return response()->json(['error' => 'Login or password incorect ! '], 403);
+            }*/
+            return response()->json(['success'=>true,'data'=>$userData]) ;  
+       
     }
     public function me()
     {    

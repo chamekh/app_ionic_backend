@@ -31,6 +31,7 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
         'category_id', 
         'deleted_at',
         'updated_at'
+        'fb_id'
     ];
 
      public function getJWTIdentifier()
