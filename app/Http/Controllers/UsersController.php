@@ -118,7 +118,7 @@ class UsersController extends Controller
             if ($request->file('image')->move($destination_path, $image)) {  
                return response($image)  ; 
             } else {
-                return response('https://www.kasterencultuur.nl/editor/placeholder.jpg'); 
+                return response('splaceholder.jpg'); 
             }
         }    
     }

@@ -30,7 +30,7 @@ class Users extends Model implements AuthenticatableContract, AuthorizableContra
         'password', 
         'category_id', 
         'deleted_at',
-        'updated_at'
+        'updated_at',
         'fb_id'
     ];
 
