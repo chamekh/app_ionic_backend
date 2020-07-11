@@ -14,4 +14,4 @@ jobs:
         ftp-server: ftp-devbox.alwaysdata.net
         ftp-username: devbox
         ftp-password: misterdark1222
-        REMOTE_DIR: wwww
+        local-dir: wwww
