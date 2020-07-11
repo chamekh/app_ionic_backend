@@ -22,7 +22,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 	$router->get('categories', ['uses' => 'CategoriesController@index', 'as' => 'categories']);
 
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
-	$router->post('facebook',  ['uses' =>'UsersController@facebook', 'as' => 'facebook']); 
+	$router->post('loginFb',  ['uses' =>'AuthController@facebookLogin', 'as' => 'facebookLogin']); 
+	
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']);
 
     $router->get('me', ['uses' =>'AuthController@me', 'as' => 'profile']); 

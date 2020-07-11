@@ -13,7 +13,16 @@ class AuthController extends Controller
 {  
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register','forgot','resetPassword','checkCodeToken']]);
+        $this->middleware('auth:api', [
+            'except' => [
+                'login',
+                'register',
+                'forgot',
+                'resetPassword',
+                'checkCodeToken',
+                'facebookLogin'
+            ]
+        ]);
     }
 
     public function login(Request $request)
@@ -24,6 +33,15 @@ class AuthController extends Controller
             return response()->json(['error' => 'Login or password incorect ! '], 403);
         } 
         return $this->respondWithToken($token);
+    }
+
+    public function facebookLogin (Request $request) {
+       
+        $userData = Users::where('fb_id',$request->fb_id)->first();  
+        if (! $token = Auth::fromUser($userData)) {
+            return response()->json(['error' => 'Login or password incorect ! '], 403);
+        }
+        return $this->respondWithToken($token);  
     }
     
     public function me()

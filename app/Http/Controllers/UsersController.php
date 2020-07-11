@@ -17,20 +17,9 @@ class UsersController extends Controller
     {
         $this->middleware('auth',['except' => [
             'prestatairesImages',
-            'uploadFileImage',
-            'facebook'
+            'uploadFileImage', 
         ]]);
-    }
-
-
-    public function facebook (Request $request) {
-       
-        $userData = Users::where('fb_id',$request->fb_id)->first();  
-        if (! $token = Auth::fromUser($userData)) {
-            return response()->json(['error' => 'Login or password incorect ! '], 403);
-        }
-        return $this->respondWithToken($token);  
-    }
+    } 
 
     public function prestataires () { 
         $users = Users::where('user_type','>',0)
