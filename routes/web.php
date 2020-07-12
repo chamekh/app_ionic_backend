@@ -23,7 +23,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
 	$router->post('loginFb',  ['uses' =>'AuthController@facebookLogin', 'as' => 'facebookLogin']); 
-	
+	$router->post('loginGoogle',  ['uses' =>'AuthController@googleLogin', 'as' => 'googleLogin']); 
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']);
 
     $router->get('me', ['uses' =>'AuthController@me', 'as' => 'profile']); 

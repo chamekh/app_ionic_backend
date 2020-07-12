@@ -20,7 +20,8 @@ class AuthController extends Controller
                 'forgot',
                 'resetPassword',
                 'checkCodeToken',
-                'facebookLogin'
+                'facebookLogin',
+                'googleLogin'
             ]
         ]);
     }
@@ -37,7 +38,15 @@ class AuthController extends Controller
 
     public function facebookLogin (Request $request) {
        
-        $userData = Users::where('fb_id',$request->fb_id)->first();  
+        $userData = Users::where('fb_id',$request->fb_id)->where('email',$request->email)->first();  
+        if (! $token = Auth::fromUser($userData)) {
+            return response()->json(['error' => 'Login or password incorect ! '], 403);
+        }
+        return $this->respondWithToken($token);  
+    }
+    public function googleLogin (Request $request) {
+       
+        $userData = Users::where('google_id',$request->google_id)->where('email',$request->email)->first();  
         if (! $token = Auth::fromUser($userData)) {
             return response()->json(['error' => 'Login or password incorect ! '], 403);
         }
@@ -107,6 +116,13 @@ class AuthController extends Controller
                 $user->category_id  = $request->category_id;
                 $user->bio          = $request->bio;
             }  
+            if ($request->fb_id) {  
+                $user->fb_id = $request->fb_id ; 
+            }
+            if ($request->google_id) {  
+                $user->google_id = $request->google_id ; 
+            }
+            
             $user->save();
             
             $credentials = ['email'=>$request->email, 'password'=>$request->password] ; 
