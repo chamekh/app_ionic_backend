@@ -16,8 +16,7 @@ class UsersController extends Controller
     public function __construct()
     {
         $this->middleware('auth',['except' => [
-            'prestatairesImages',
-            'uploadFileImage', 
+            'prestatairesImages', 
         ]]);
     } 
 
@@ -88,8 +87,7 @@ class UsersController extends Controller
 
         $user->last_name    = $request->last_name;
         $user->first_name   = $request->first_name;
-        $user->email        = $request->email; 
-        $user->avatar       = $request->avatar;
+        $user->email        = $request->email;  
         $user->tel          = $request->tel;
         $user->fb           = $request->fb;
         $user->insta        = $request->insta;
@@ -99,29 +97,25 @@ class UsersController extends Controller
         $user->zip_code     = $request->zip_code ;   
         $user->bio          = $request->bio; 
 
-        if ($request->password) { 
-            $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
-        }
-
-        $user->save();
-
-        return response()->json(['success'=>true,'data'=>$user]) ; 
-    }
-    public function uploadFileImage (Request $request) {  
-
-        if ($request->hasFile('image')) {
-            $original_filename = $request->file('image')->getClientOriginalName();
-            $original_filename_arr = explode('.', $original_filename);
-            $file_ext = end($original_filename_arr);
-            $destination_path = storage_path().'/app/images/users/';
-            $image = 'U-' . time() . '.' . $file_ext;
-
-            if ($request->file('image')->move($destination_path, $image)) {  
-               return response($image)  ; 
-            } else {
-                return response('splaceholder.jpg'); 
+        if ($request->avatar) {
+            $new_name = $user->avatar ; 
+            if (preg_match('/^data:image\/(\w+);base64,/', $request->avatar )) {
+                $data = substr($request->avatar, strpos($request->avatar, ',') + 1);   
+                $data = base64_decode($data);
+                $new_name = 'U-' . time() . '.' . 'png'; 
+                $path_to_save = 'images/users/' ;  
+                Storage::disk('local')->put($path_to_save.$new_name, $data);  
+            } 
+            $user->avatar       = $new_name;
+        } 
+        if ($request->password && $request->old_password) { 
+            if (app('hash')->make($request->old_password, ['rounds' => 12]) == $user->password) {
+                $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
+            }else{
+                return response()->json(['success'=>false,'msg'=>'current password incorrect !']) ;
             }
-        }    
-    }
-    
+        } 
+        $user->save(); 
+        return response()->json(['success'=>true,'data'=>$user]) ; 
+    } 
 }

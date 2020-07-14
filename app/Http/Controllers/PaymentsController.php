@@ -24,7 +24,7 @@ class PaymentsController extends Controller
 
     public function store (Request $request) {   
         $user = Auth::user() ;  
-        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe\Stripe::setApiKey('sk_test_OwWM7x1bF20kLX9JN153mXC400Amfhg649');
 
         try {  
             $customer = \Stripe\Customer::create(array( 
@@ -34,7 +34,7 @@ class PaymentsController extends Controller
         }catch(Exception $e) {  
             $api_error = $e->getMessage();  
         }
-
+ 
         if(empty($api_error) && $customer){   
             try {  
                 $charge = \Stripe\Charge::create(array( 
@@ -63,8 +63,7 @@ class PaymentsController extends Controller
                 $update_user = Users::where('id', $user->id)->update(['status' => 1]) ;  
                 return response()->json(['success' =>true, 'data' =>$payment  ], 200);
 
-            } catch (\Exception $e) {
-                //return error message
+            } catch (\Exception $e) { 
                 return response()->json(['success' =>false, 'message' => $e ], 403);
             }
 

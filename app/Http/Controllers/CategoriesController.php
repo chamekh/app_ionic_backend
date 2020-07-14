@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Categories; 
+use Illuminate\Support\Facades\Storage; 
 
 
 class CategoriesController extends Controller
@@ -46,6 +47,10 @@ class CategoriesController extends Controller
         $category->name = $request->name ; 
         $category->save() ; 
         return response()->json(['success' =>true, 'message' => $category ], 200); 
+    }
+    public function categoryImages($image) {  
+        $path = storage_path('app/images/categories/'.$image) ; 
+        return response(Storage::get('images/categories/'.$image), 200, ['Content-Type' => 'image/jpeg']);
     }
 }
 

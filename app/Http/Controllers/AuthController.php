@@ -7,7 +7,7 @@ use App\Users;
 use Illuminate\Support\Str; 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
+use Illuminate\Support\Facades\Storage; 
      
 class AuthController extends Controller
 {  
@@ -21,7 +21,7 @@ class AuthController extends Controller
                 'resetPassword',
                 'checkCodeToken',
                 'facebookLogin',
-                'googleLogin'
+                'googleLogin',  
             ]
         ]);
     }
@@ -97,34 +97,47 @@ class AuthController extends Controller
         try {   
            
             $user = new Users();
-            $user->last_name    = $request->last_name;
-            $user->first_name   = $request->first_name;
-            $user->email        = $request->email;
-            $user->password     = app('hash')->make($request->password, ['rounds' => 12]);
-            $user->avatar       = $request->avatar;
-            $user->tel          = $request->tel;
-            $user->fb           = $request->fb;
-            $user->insta        = $request->insta;
-            $user->country     =  $request->country ;
-            $user->state       =  $request->state ;
-            $user->adresse     =  $request->adresse ;
-            $user->zip_code    =  $request->zip_code ;
-            $user->latitude    =  $request->latitude ;
-            $user->longitude   =  $request->longitude ;  
+            $user->last_name    =  $request->last_name;
+            $user->first_name   =  $request->first_name;
+            $user->email        =  $request->email;
+            $user->password     =  app('hash')->make($request->password, ['rounds' => 12]); 
+            $user->tel          =  $request->tel;
+            $user->fb           =  $request->fb;
+            $user->insta        =  $request->insta;
+            $user->country      =  $request->country ;
+            $user->state        =  $request->state ;
+            $user->adresse      =  $request->adresse ;
+            $user->zip_code     =  $request->zip_code ;
+            $user->latitude     =  $request->latitude ;
+            $user->longitude    =  $request->longitude ;
+            $user->status       =  1 ;   
+            
             if ($request->user_type == 1) { 
                 $user->user_type    = $request->user_type; 
                 $user->category_id  = $request->category_id;
                 $user->bio          = $request->bio;
+                $user->status       = 0 ; 
             }  
             if ($request->fb_id) {  
-                $user->fb_id = $request->fb_id ; 
-            }
+                $user->fb_id  = $request->fb_id ; 
+                $user->avatar = $this->getFacebookImage ($fb_id); 
+            } 
             if ($request->google_id) {  
                 $user->google_id = $request->google_id ; 
-            }
-            
-            $user->save();
-            
+                $user->avatar = $this->getGoogleImage ($request->avatar);
+            }   
+            if (!$request->fb_id && !$request->google_id ) { 
+                $new_name = 'placeholder.png' ;  
+                if (preg_match('/^data:image\/(\w+);base64,/', $request->avatar )) {
+                    $data = substr($request->avatar, strpos($request->avatar, ',') + 1);   
+                    $data = base64_decode($data);
+                    $new_name = 'U-' . time() . '.' . 'png'; 
+                    $path_to_save = 'images/users/' ;  
+                    Storage::disk('local')->put($path_to_save.$new_name, $data);  
+                } 
+                $user->avatar       = $new_name;
+            }   
+            $user->save(); 
             $credentials = ['email'=>$request->email, 'password'=>$request->password] ; 
             $token = Auth::attempt($credentials);
 
@@ -134,10 +147,9 @@ class AuthController extends Controller
                   'token' => $token
               ], 200);
 
-        } catch (\Exception $e) {
-            //return error message
+        } catch (\Exception $e) { 
             return response()->json(['success' =>false, 'message' => $e ], 409);
-        }
+        }  
     }
 
     public function forgot (Request $request) {
@@ -195,5 +207,23 @@ class AuthController extends Controller
         } catch (Exception $e) {
             return false ; 
         }
+    }
+    public function getFacebookImage ($fb_id) {  
+        $facebook_image_data = 'https://graph.facebook.com/'.$fb_id.'/picture?type=large&redirect=false' ; 
+        $contents = file_get_contents($facebook_image_data);
+        $decodedData = json_decode($contents) ; 
+        $fb_url = $decodedData->data->url ; 
+        $fb_image =  file_get_contents($fb_url);
+        $name ='U-' . time() . '.' . 'png'; 
+        $path_to_save = 'images/users/' ; 
+        Storage::disk('local')->put($path_to_save.$name, $fb_image);
+        return $name;  
+    }
+    public function getGoogleImage ($avatar_url) { 
+        $contents = file_get_contents($avatar_url);
+        $name ='U-' . time() . '.' . 'png'; 
+        $path_to_save = 'images/users/' ; 
+        Storage::disk('local')->put($path_to_save.$name, $contents);
+        return $name;  
     }
 }
