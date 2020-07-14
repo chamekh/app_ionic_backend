@@ -22,6 +22,8 @@ class AuthController extends Controller
                 'checkCodeToken',
                 'facebookLogin',
                 'googleLogin',  
+                'getFacebookImageForLogin',
+                'getGoogleImageForLogin'
             ]
         ]);
     }
@@ -91,16 +93,14 @@ class AuthController extends Controller
             'last_name' => 'required|string',
             'first_name' => 'required|string',
             'email' => 'required|email|unique:users',
-            'password' => 'required',
         ]);
 
         try {   
-           
+            $plain_password ='' ; 
             $user = new Users();
             $user->last_name    =  $request->last_name;
             $user->first_name   =  $request->first_name;
-            $user->email        =  $request->email;
-            $user->password     =  app('hash')->make($request->password, ['rounds' => 12]); 
+            $user->email        =  $request->email;  
             $user->tel          =  $request->tel;
             $user->fb           =  $request->fb;
             $user->insta        =  $request->insta;
@@ -111,6 +111,7 @@ class AuthController extends Controller
             $user->latitude     =  $request->latitude ;
             $user->longitude    =  $request->longitude ;
             $user->status       =  1 ;   
+            $user->password     =  app('hash')->make($request->password, ['rounds' => 12]);
             
             if ($request->user_type == 1) { 
                 $user->user_type    = $request->user_type; 
@@ -120,7 +121,7 @@ class AuthController extends Controller
             }  
             if ($request->fb_id) {  
                 $user->fb_id  = $request->fb_id ; 
-                $user->avatar = $this->getFacebookImage ($fb_id); 
+                $user->avatar = $this->getFacebookImage ($request->fb_id);  
             } 
             if ($request->google_id) {  
                 $user->google_id = $request->google_id ; 
@@ -135,9 +136,12 @@ class AuthController extends Controller
                     $path_to_save = 'images/users/' ;  
                     Storage::disk('local')->put($path_to_save.$new_name, $data);  
                 } 
-                $user->avatar       = $new_name;
-            }   
+                $user->avatar       = $new_name; 
+            }
+
             $user->save(); 
+ 
+            
             $credentials = ['email'=>$request->email, 'password'=>$request->password] ; 
             $token = Auth::attempt($credentials);
 
@@ -148,7 +152,7 @@ class AuthController extends Controller
               ], 200);
 
         } catch (\Exception $e) { 
-            return response()->json(['success' =>false, 'message' => $e ], 409);
+            return response()->json(['success' =>false, 'message' => $plain_password ], 400);
         }  
     }
 
@@ -219,8 +223,26 @@ class AuthController extends Controller
         Storage::disk('local')->put($path_to_save.$name, $fb_image);
         return $name;  
     }
+    public function getFacebookImageForLogin ($fb_id) {  
+        $facebook_image_data = 'https://graph.facebook.com/'.$fb_id.'/picture?type=large&redirect=false' ; 
+        $contents = file_get_contents($facebook_image_data);
+        $decodedData = json_decode($contents) ; 
+        $fb_url = $decodedData->data->url ; 
+        $fb_image =  file_get_contents($fb_url);
+        $name ='U-' . time() . '.' . 'png'; 
+        $path_to_save = 'images/users/' ; 
+        Storage::disk('local')->put($path_to_save.$name, $fb_image); 
+        return response()->json(['success'=>true,'data'=>$name],200) ; 
+    }
     public function getGoogleImage ($avatar_url) { 
         $contents = file_get_contents($avatar_url);
+        $name ='U-' . time() . '.' . 'png'; 
+        $path_to_save = 'images/users/' ; 
+        Storage::disk('local')->put($path_to_save.$name, $contents);
+        return $name;  
+    }
+    public function getGoogleImageForLogin (Request $request) { 
+        $contents = file_get_contents($request->avatar_url);
         $name ='U-' . time() . '.' . 'png'; 
         $path_to_save = 'images/users/' ; 
         Storage::disk('local')->put($path_to_save.$name, $contents);
