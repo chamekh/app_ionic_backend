@@ -8,6 +8,7 @@ use App\Users;
 use App\Adresses;
 use App\Prestataires; 
 use App\Categories; 
+use App\Rating; 
 use Illuminate\Support\Facades\Storage; 
      
 class UsersController extends Controller
@@ -42,12 +43,53 @@ class UsersController extends Controller
                 ->where('status',1)
                 ->with(
                     'category',
-                    'payments'
+                    'payments', 
                 )
                 ->get(); 
-        return response()->json(['success'=>true,'data'=>$this->orberByDistance($users,$ln,$lg)]) ;
+        $nUsers = $this->calculateRating($users) ;  
+        return response()->json(['success'=>true,'data'=>$this->orberByDistance($nUsers,$ln,$lg)]) ;
     } 
+    private function calculateRating ($users) {
+        $new_users = [] ; 
+        if (count($users)) { 
+            foreach ($users as $user) {
+                $ratings = Rating::where('presta_id',$user->id)->get();
+                $my_rate = Rating::where('presta_id',$user->id)->where('user_id',Auth::user()->id)->first() ;
+                $globalRating = 0 ;
+                $countRating = 0 ;
+                $user->my_rate = $my_rate ; 
+                if (count($ratings) > 0 ) {  
+                    foreach ($ratings as $rating) {
+                        $globalRating = $globalRating+$rating->value ; 
+                        $countRating = $countRating+1 ; 
+                    }
+                    $moyen_rating = ($globalRating / $countRating) / 5; 
+                    $user->rating = $moyen_rating ; 
+                    $new_users[] = $user ; 
+                }else{
+                    $user->rating = 0 ; 
+                    $new_users[] = $user ; 
+                }
+            }
+        }
+        return $new_users ; 
+    }
+    public function addRatingPrestataire (Request $request) {
+        $myId = Auth::user()->id ; 
+        $rating = new Rating() ;
+        $rating->user_id = Auth::user()->id ; 
+        $rating->presta_id = $request->presta_id;
+        $rating->value = $request->rating;
 
+        if ($rating->save()) {
+            return response()->json(['success'=>true,'data'=>$rating]) ;
+        }else{
+            return response()->json([
+                  'success' => false,
+                  'message' => 'Sorry, user cannot be found.'
+              ], 200);
+        } 
+    }
     private function orberByDistance ($array,$ln,$lg) {
         $n_array = array() ;    
         foreach ($array as $user) {

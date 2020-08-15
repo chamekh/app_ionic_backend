@@ -20,10 +20,14 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api'], function () use ($router) {
 
 	$router->get('categories', ['uses' => 'CategoriesController@index', 'as' => 'categories']);
+	$router->get('category/{image}', ['uses' => 'CategoriesController@categoryImages', 'as' => 'categoryImages']);
 
 	$router->post('login',  ['uses' =>'AuthController@login', 'as' => 'login']); 
 	$router->post('loginFb',  ['uses' =>'AuthController@facebookLogin', 'as' => 'facebookLogin']); 
 	$router->post('loginGoogle',  ['uses' =>'AuthController@googleLogin', 'as' => 'googleLogin']); 
+	$router->get('getFacebookImage/{fb_id}',  ['uses' =>'AuthController@getFacebookImageForLogin', 'as' => 'getFacebookImageForLogin']); 
+	$router->post('getGoogleImage',  ['uses' =>'AuthController@getGoogleImageForLogin', 'as' => 'getGoogleImageForLogin']); 
+	
 	$router->post('register', ['uses' => 'AuthController@register', 'as' => 'register']);
 
     $router->get('me', ['uses' =>'AuthController@me', 'as' => 'profile']); 
@@ -42,9 +46,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 	$router->post('reservation', ['uses' => 'ReservationsController@store', 'as' => 'makeReservation']); 
 	$router->get('reservation', ['uses' => 'ReservationsController@showReservations', 'as' => 'getReservation']); 
 
+	$router->post('add_rating', ['uses' => 'UsersController@addRatingPrestataire', 'as' => 'addRatingPrestataire']); 
 	//$router->get('notifications',  ['uses' =>'NotificationsController@index', 'as' => 'myNotifications']);  
 	//$router->get('notification/{id}',  ['uses' =>'NotificationsController@setNotficationsVue', 'as' => 'makeVueNotifications']); 
-	$router->post('uploadFile', ['uses' => 'UsersController@uploadFileImage', 'as' => 'uploadFileImage']); 
+	   
 });
 
  
